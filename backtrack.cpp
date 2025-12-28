@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <vector>
+#include <cassert> 
 using namespace std;
 
 // edges = { {u, v}, ... }
@@ -37,7 +38,56 @@ void set_ZK(int idx, vector<int>& inf, vector<int>& outf, vector<int>& current_f
         inf[v] = (inf[v] - val + k_mod) % k_mod;
     }
 }
+//tests
+bool isValidFlow(const vector<int>& flow, const vector<vector<int>>& edges, int n, int k) {
+    vector<int> inf(n + 1, 0);
+    vector<int> outf(n + 1, 0);
+
+    for (size_t i = 0; i < edges.size(); ++i) {
+        int u = edges[i][0];
+        int v = edges[i][1];
+        int val = flow[i];
+        outf[u] = (outf[u] + val) % k;
+        inf[v] = (inf[v] + val) % k;
+    }
+
+    for (int v = 1; v <= n; ++v) {
+        if (inf[v] != outf[v]) return false;
+    }
+    return true;
+}
+void runTests() {
+    //n=3, m=3, k=3
+    vector<vector<int>> edges1 = { {1, 2}, {2, 3}, {3, 1} };
+    assert(isValidFlow({ 1, 1, 1 }, edges1, 3, 3) == true);
+    assert(isValidFlow({ 2, 2, 2 }, edges1, 3, 3) == true);
+    assert(isValidFlow({ 1, 1, 2 }, edges1, 3, 3) == false);
+
+    // n=4, m=4, k=3
+    vector<vector<int>> edges2 = { {1, 2}, {2, 3}, {3, 4}, {4, 1} };
+    assert(isValidFlow({ 1, 1, 1, 1 }, edges2, 4, 3) == true);
+    assert(isValidFlow({ 2, 2, 2, 2 }, edges2, 4, 3) == true);
+
+    //n=3, m=2, k=3
+    edges = { {1, 2}, {2, 3} };
+    n = 3;
+    m = 2;
+    k_mod = 3;
+
+    vector<int> inf(n + 1, 0);
+    vector<int> outf(n + 1, 0);
+    vector<int> current_flow(m);
+
+    all_flows.clear();
+    set_ZK(0, inf, outf, current_flow);
+
+    assert(all_flows.size() == 0);
+
+    cout << "All tests passed\n";
+}
+
 int main() {
+    runTests();
     cout << "n (vertices), m (edges), k (mod): ";
     cin >> n >> m >> k_mod;
     // nacitame m hran
